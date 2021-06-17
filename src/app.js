@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 require("./db/connection");
 const UserRanking=require("./models/usermessage");
@@ -36,8 +37,9 @@ app.post("/register",async(req,res)=>{
         if(password===cpassword){
            const RegData=new Reg(req.body);
 
-           const token = await RegData.gen
-           Token();
+           const token = await RegData.genToken();
+
+
         await RegData.save();
         res.status(201).render("login");
         }
@@ -55,6 +57,8 @@ app.post("/login",async(req,res)=>{
         const useremail=await Reg.findOne({email:email});
         const isMatch=await bcrypt.compare(password,useremail.password);
         if(isMatch){
+            const token = await useremail.genToken();
+            console.log(token);
             res.status(201).render("index");
         }else{
             res.send("invalid login credentials");
@@ -64,6 +68,7 @@ app.post("/login",async(req,res)=>{
         res.status(400).send("invalid login credentials");
     }
 })
+
 app.post("/contact",async(req,res)=>{
     try{
         //res.send(req.body);
